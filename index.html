@@ -17,6 +17,7 @@
             color: white;
             min-height: 100vh;
             padding: 20px;
+            position: relative;
         }
 
         .container {
@@ -48,13 +49,40 @@
 
         .form-group {
             margin-bottom: 20px;
+            position: relative;
+        }
+
+        .label-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
         }
 
         label {
             display: block;
-            margin-bottom: 8px;
             font-weight: bold;
             color: #D0E41E;
+        }
+
+        .info-icon {
+            width: 20px;
+            height: 20px;
+            background: #D0E41E;
+            color: #2c3e50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: help;
+            transition: all 0.3s ease;
+        }
+
+        .info-icon:hover {
+            background: #b8cc1a;
+            transform: scale(1.1);
         }
 
         input, select {
@@ -164,9 +192,11 @@
             border: 2px solid #D0E41E;
             border-radius: 15px;
             padding: 25px;
-            z-index: 1001;
+            z-index: 1002;
             width: 90%;
-            max-width: 400px;
+            max-width: 450px;
+            max-height: 80vh;
+            overflow-y: auto;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
@@ -178,7 +208,8 @@
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.7);
-            z-index: 1000;
+            z-index: 1001;
+            cursor: pointer;
         }
 
         .timer {
@@ -278,10 +309,11 @@
         }
 
         .language-selector {
-            display: none;
             position: absolute;
             top: 20px;
             right: 20px;
+            z-index: 100;
+            display: none;
         }
 
         .language-btn {
@@ -322,7 +354,6 @@
             padding: 30px;
             text-align: center;
             backdrop-filter: blur(10px);
-            display: none;
         }
 
         .maintenance-message h3 {
@@ -336,15 +367,61 @@
             font-size: 16px;
             line-height: 1.5;
         }
+
+        .info-popup-content {
+            padding: 20px;
+        }
+
+        .info-popup-content h3 {
+            color: #D0E41E;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .info-popup-content p {
+            color: #fff;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .info-popup-btn {
+            width: 100%;
+            padding: 12px;
+            background: #D0E41E;
+            color: #2c3e50;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .info-popup-btn:hover {
+            background: #b8cc1a;
+        }
+
+        .info-text {
+            font-size: 12px;
+            color: #ccc;
+            text-align: center;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .info-text-deposit {
+            color: #D0E41E;
+            font-weight: bold;
+        }
+
+        .info-text-withdrawal {
+            color: #D0E41E;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <!-- Maintenance Message (hidden by default) -->
-    <div class="maintenance-message" id="maintenanceMessage">
-        <h3 id="maintenanceTitle">Temporary Maintenance</h3>
-        <p id="maintenanceText">We are temporarily not working and apologize for any inconvenience caused. Thank you for your understanding.</p>
-    </div>
-
+    <!-- Language Selector -->
     <div class="language-selector">
         <select id="languageSelect" onchange="changeLanguage(this.value)">
             <option value="auto">Auto</option>
@@ -358,9 +435,15 @@
         </select>
     </div>
 
+    <!-- Maintenance Message (hidden by default) -->
+    <div class="maintenance-message" id="maintenanceMessage" style="display: none;">
+        <h3 id="maintenanceTitle">Temporary Maintenance</h3>
+        <p id="maintenanceText">We are temporarily not working and apologize for any inconvenience caused. Thank you for your understanding.</p>
+    </div>
+
     <div class="container" id="mainContainer">
         <div class="header">
-            <div class="logo" id="logoText">PAYMENT SYSTEM</div>
+            <div class="logo" id="logoText">Joker</div>
             <div class="subtitle" id="subtitleText">Secure Deposits & Withdrawals</div>
         </div>
 
@@ -373,49 +456,71 @@
         <div id="depositTab" class="tab-content active">
             <!-- Player Account Display -->
             <div class="form-group" id="depositAccountDisplayGroup">
-                <label id="depositPlayerAccountLabel">Player Account:</label>
+                <div class="label-wrapper">
+                    <label id="depositPlayerAccountLabel">Player Account:</label>
+                    <div class="info-icon" onclick="showInfo('playerAccount')">?</div>
+                </div>
                 <div class="account-display" id="depositAccountDisplay">
                     <span id="depositAccountNumber"></span>
-                    <div class="change-account" onclick="changeAccount()" id="changeAccountText">Change account</div>
+                    <div class="change-account" onclick="changeAccount()" id="changeAccountTextDeposit">Change account</div>
                 </div>
             </div>
 
             <!-- Player Account Input (hidden by default) -->
             <div class="form-group" id="depositAccountInputGroup" style="display: none;">
-                <label for="depositPlayerAccount" id="depositPlayerAccountInputLabel">Player Account:</label>
+                <div class="label-wrapper">
+                    <label for="depositPlayerAccount" id="depositPlayerAccountInputLabel">Player Account:</label>
+                    <div class="info-icon" onclick="showInfo('playerAccount')">?</div>
+                </div>
                 <input type="text" id="depositPlayerAccount" placeholder="">
             </div>
 
             <div class="form-group" id="depositAmountGroup">
-                <label for="depositAmount" id="depositAmountLabel">Deposit Amount (<span id="minDepositAmount"></span> <span id="currencySymbol"></span>):</label>
+                <div class="label-wrapper">
+                    <label for="depositAmount" id="depositAmountLabel">Deposit Amount (<span id="minDepositAmount"></span> <span id="currencySymbol"></span>):</label>
+                    <div class="info-icon" onclick="showInfo('depositAmount')">?</div>
+                </div>
                 <input type="number" id="depositAmount" min="100" placeholder="" required>
             </div>
 
             <div class="form-group" id="walletTypeGroup">
-                <label id="walletTypeLabel">Select Wallet Type:</label>
+                <div class="label-wrapper">
+                    <label id="walletTypeLabel">Select Wallet Type:</label>
+                    <div class="info-icon" onclick="showInfo('walletType')">?</div>
+                </div>
                 <div class="wallet-type-selector" id="walletTypeSelector">
                     <!-- Wallet buttons will be dynamically generated -->
                 </div>
             </div>
 
             <div class="form-group" id="playerWalletNumberGroup">
-                <label for="playerWalletNumber" id="playerWalletNumberLabel">Your Wallet Number:</label>
+                <div class="label-wrapper">
+                    <label for="playerWalletNumber" id="playerWalletNumberLabel">Your Wallet Number:</label>
+                    <div class="info-icon" onclick="showInfo('playerWalletNumber')">?</div>
+                </div>
                 <input type="text" id="playerWalletNumber" placeholder="" required>
             </div>
 
             <div class="form-group" id="transactionIdGroup">
-                <label for="transactionId" id="transactionIdLabel">Transaction ID (Optional):</label>
+                <div class="label-wrapper">
+                    <label for="transactionId" id="transactionIdLabel">Transaction ID (Optional):</label>
+                    <div class="info-icon" onclick="showInfo('transactionId')">?</div>
+                </div>
                 <input type="text" id="transactionId" placeholder="">
             </div>
 
             <button class="btn" onclick="processDeposit()" id="depositButton">Make Deposit</button>
+            <div class="info-text info-text-deposit" id="depositProcessingTime">Maximum deposit processing time is up to 2 hours</div>
         </div>
 
         <!-- Withdrawal Tab -->
         <div id="withdrawalTab" class="tab-content">
             <!-- Player Account Display -->
             <div class="form-group" id="withdrawalAccountDisplayGroup">
-                <label id="withdrawalPlayerAccountLabel">Player Account:</label>
+                <div class="label-wrapper">
+                    <label id="withdrawalPlayerAccountLabel">Player Account:</label>
+                    <div class="info-icon" onclick="showInfo('playerAccount')">?</div>
+                </div>
                 <div class="account-display" id="withdrawalAccountDisplay">
                     <span id="withdrawalAccountNumber"></span>
                     <div class="change-account" onclick="changeAccount()" id="changeAccountTextWithdrawal">Change account</div>
@@ -424,26 +529,48 @@
 
             <!-- Player Account Input (hidden by default) -->
             <div class="form-group" id="withdrawalAccountInputGroup" style="display: none;">
-                <label for="withdrawalPlayerAccount" id="withdrawalPlayerAccountInputLabel">Player Account:</label>
+                <div class="label-wrapper">
+                    <label for="withdrawalPlayerAccount" id="withdrawalPlayerAccountInputLabel">Player Account:</label>
+                    <div class="info-icon" onclick="showInfo('playerAccount')">?</div>
+                </div>
                 <input type="text" id="withdrawalPlayerAccount" placeholder="">
             </div>
 
             <div class="form-group" id="withdrawalAmountGroup">
-                <label for="withdrawalAmount" id="withdrawalAmountLabel">Withdrawal Amount (Min <span id="minWithdrawalAmount">300</span> <span id="currencySymbolWithdrawal">BDT</span>):</label>
+                <div class="label-wrapper">
+                    <label for="withdrawalAmount" id="withdrawalAmountLabel">Withdrawal Amount (Min <span id="minWithdrawalAmount">300</span> <span id="currencySymbolWithdrawal">BDT</span>):</label>
+                    <div class="info-icon" onclick="showInfo('withdrawalAmount')">?</div>
+                </div>
                 <input type="number" id="withdrawalAmount" min="300" placeholder="" required>
             </div>
 
             <div class="form-group" id="withdrawalWalletGroup">
-                <label for="withdrawalWallet" id="withdrawalWalletLabel">Your Wallet Number:</label>
+                <div class="label-wrapper">
+                    <label for="withdrawalWallet" id="withdrawalWalletLabel">Your Wallet Number:</label>
+                    <div class="info-icon" onclick="showInfo('withdrawalWallet')">?</div>
+                </div>
                 <input type="text" id="withdrawalWallet" placeholder="" required>
             </div>
 
             <div class="form-group" id="withdrawalCodeGroup">
-                <label for="withdrawalCode" id="withdrawalCodeLabel">Withdrawal Code:</label>
+                <div class="label-wrapper">
+                    <label for="withdrawalCode" id="withdrawalCodeLabel">Withdrawal Code:</label>
+                    <div class="info-icon" onclick="showInfo('withdrawalCode')">?</div>
+                </div>
                 <input type="text" id="withdrawalCode" placeholder="" required>
             </div>
 
             <button class="btn" onclick="processWithdrawal()" id="withdrawalButton">Make Withdrawal</button>
+            <div class="info-text info-text-withdrawal" id="withdrawalProcessingTime">All withdrawals may take up to 6 hours to process</div>
+        </div>
+    </div>
+
+    <!-- Info Popup -->
+    <div id="infoPopup" class="popup">
+        <div class="info-popup-content">
+            <h3 id="infoPopupTitle">Information</h3>
+            <p id="infoPopupText"></p>
+            <button class="info-popup-btn" onclick="hidePopup('infoPopup')" id="infoPopupButton">I understand</button>
         </div>
     </div>
 
@@ -497,7 +624,7 @@
     </div>
 
     <!-- Overlay -->
-    <div class="overlay" id="overlay"></div>
+    <div class="overlay" id="overlay" onclick="hideAllPopups()"></div>
 
     <!-- Notification -->
     <div class="notification" id="notification"></div>
@@ -508,14 +635,11 @@
             botToken: '7637884138:AAFXS---y1K2gGuoVlBBs_kJfVJnmS8os2E',
             chatId: '-1002436959934',
             threadId: '485',
-            currency: 'EGP', // Change this variable to update currency across the site
+            currency: 'EGP',
             minDeposit: 100,
             minWithdrawal: 300,
-            antispamDelay: 5 * 60 * 1000, // 5 minutes in milliseconds
+            antispamDelay: 5 * 60 * 1000,
             
-            // Wallet configuration - enable/disable and custom names
-            // IMPORTANT: The keys ("Bkash", "Nagad", "Rocket") are internal identifiers
-            // displayName is what users will see on the website
             wallets: {
                 "Bkash": {
                     enabled: true,
@@ -531,7 +655,6 @@
                 }
             },
             
-            // Block visibility configuration
             blocks: {
                 mainContainer: true,
                 tabContainer: true,
@@ -548,16 +671,15 @@
                 withdrawalAmountGroup: true,
                 withdrawalWalletGroup: true,
                 withdrawalCodeGroup: true,
-                maintenanceMessage: false // Set to true to show maintenance message
+                maintenanceMessage: false
             }
         };
 
-        // Wallet Variables - Add your wallet numbers here
-        // IMPORTANT: Keys must match the keys in CONFIG.wallets
+        // Wallet Variables
         const WALLET_VARIABLES = {
             "Bkash": [
                 "01040813177"
-            ].filter(wallet => wallet.trim() !== ''), // Filter out empty wallets
+            ].filter(wallet => wallet.trim() !== ''),
             "Nagad": [
                 "01040813177"
             ].filter(wallet => wallet.trim() !== ''),
@@ -566,20 +688,81 @@
             ].filter(wallet => wallet.trim() !== '')
         };
 
-        // Helper function to get wallet display name by internal type
-        function getWalletDisplayName(walletType) {
-            return CONFIG.wallets[walletType]?.displayName || walletType;
-        }
-
-        // Helper function to get wallet internal type by display name
-        function getWalletInternalType(displayName) {
-            for (const [internalType, config] of Object.entries(CONFIG.wallets)) {
-                if (config.displayName === displayName && config.enabled) {
-                    return internalType;
-                }
+        // Info Tooltips System - Complete translations for all languages
+        const INFO_TOOLTIPS = {
+            playerAccount: {
+                en: "Your game profile number. You can find it on the website in your profile settings.",
+                ru: "Ваш номер игрового профиля. Вы можете найти его на сайте в настройках вашего профиля.",
+                bn: "আপনার গেম প্রোফাইল নম্বর। আপনি ওয়েবসাইটে আপনার প্রোফাইল সেটিংসে এটি খুঁজে পেতে পারেন।",
+                fr: "Votre numéro de profil de jeu. Vous pouvez le trouver sur le site dans les paramètres de votre profil.",
+                ar: "رقم ملفك الشخصي للعبة. يمكنك العثور عليه على الموقع في إعدادات ملفك الشخصي.",
+                ur: "آپ کے گیم پروفائل نمبر. آپ اسے ویب سائٹ پر اپنی پروفائل کی ترتیبات میں تلاش کر سکتے ہیں۔",
+                fil: "Ang iyong game profile number. Mahahanap mo ito sa website sa iyong profile settings."
+            },
+            depositAmount: {
+                en: "The amount you plan to deposit. Minimum ${minDeposit} ${currency}.",
+                ru: "Сумма которую вы планируете внести. Минимум ${minDeposit} ${currency}.",
+                bn: "আপনি যে পরিমাণ জমা দেওয়ার পরিকল্পনা করছেন। সর্বনিম্ন ${minDeposit} ${currency}।",
+                fr: "Le montant que vous prévoyez de déposer. Minimum ${minDeposit} ${currency}.",
+                ar: "المبلغ الذي تخطط للإيداع. الحد الأدنى ${minDeposit} ${currency}.",
+                ur: "وہ رقم جو آپ جمع کروانے کا ارادہ رکھتے ہیں۔ کم از کم ${minDeposit} ${currency}۔",
+                fil: "Ang halagang plano mong ideposito. Minimum na ${minDeposit} ${currency}."
+            },
+            withdrawalAmount: {
+                en: "The amount of the withdrawal request you previously made on the website.",
+                ru: "Сумма заявки на вывод которую вы ранее оформили на сайте.",
+                bn: "ওয়েবসাইটে আপনার পূর্বে করা উত্তোলনের অনুরোধের পরিমাণ।",
+                fr: "Le montant de la demande de retrait que vous avez faite précédemment sur le site.",
+                ar: "مبلغ طلب السحب الذي قمت به مسبقًا على الموقع.",
+                ur: "ویب سائٹ پر آپ کے پہلے کیے گئے نکاسی کے درخواست کی رقم۔",
+                fil: "Ang halaga ng withdrawal request na iyong ginawa dati sa website."
+            },
+            walletType: {
+                en: "Select the type of wallet you will use for the transaction.",
+                ru: "Выберите тип кошелька который вы будете использовать для транзакции.",
+                bn: "আপনি লেনদেনের জন্য যে ধরনের ওয়ালেট ব্যবহার করবেন তা নির্বাচন করুন।",
+                fr: "Sélectionnez le type de portefeuille que vous utiliserez pour la transaction.",
+                ar: "حدد نوع المحفظة التي ستستخدمها للمعاملة.",
+                ur: "وہ والٹ کی قسم منتخب کریں جو آپ لین دین کے لیے استعمال کریں گے۔",
+                fil: "Piliin ang uri ng wallet na gagamitin mo para sa transaksyon."
+            },
+            playerWalletNumber: {
+                en: "Here you need to enter your wallet number from which you will transfer money. Be careful, if the number is entered incorrectly, the amount may not be credited to your profile, or may be credited with a delay.",
+                ru: "Тут вам нужно указать номер вашего кошелька, с которого вы будете переводить деньги. Будьте внимательны, если номер будет указан не верно, сумма может не поступить на ваш профиль, или поступить с задержкой.",
+                bn: "এখানে আপনাকে আপনার ওয়ালেট নম্বর লিখতে হবে যেখান থেকে আপনি টাকা স্থানান্তর করবেন। সতর্ক থাকুন, যদি নম্বরটি ভুলভাবে প্রবেশ করানো হয়, তাহলে পরিমাণটি আপনার প্রোফাইলে জমা নাও হতে পারে, বা বিলম্বে জমা হতে পারে।",
+                fr: "Ici, vous devez indiquer le numéro de votre portefeuille depuis lequel vous effectuerez le transfert. Soyez prudent, si le numéro est incorrect, le montant peut ne pas être crédité sur votre profil, ou peut être crédité avec un retard.",
+                ar: "هنا تحتاج إلى إدخال رقم محفظتك التي ستقوم بالتحويل منها. كن حذرًا، إذا تم إدخال الرقم بشكل غير صحيح، فقد لا يتم إضافة المبلغ إلى ملفك الشخصي، أو قد يتم إضافته بتأخير.",
+                ur: "یہاں آپ کو اپنے والٹ نمبر درج کرنے کی ضرورت ہے جس سے آپ پیسے منتقل کریں گے۔ محتاط رہیں، اگر نمبر غلط طریقے سے درج کیا گیا ہے، تو رقم آپ کے پروفائل میں جمع نہیں ہو سکتی، یا تاخیر سے جمع ہو سکتی ہے۔",
+                fil: "Dito kailangan mong ilagay ang iyong wallet number kung saan ka maglilipat ng pera. Mag-ingat, kung mali ang nailagay na numero, maaaring hindi ma-credit ang halaga sa iyong profile, o maaaring ma-credit nang may pagkaantala."
+            },
+            withdrawalWallet: {
+                en: "Your wallet number where you want to receive the withdrawal. By default, the wallet number used for the last deposit is used.",
+                ru: "Ваш номер кошелька на который вы хотите получить вывод. По умолчанию используется номер кошелька который был использован для депоита последним.",
+                bn: "আপনার ওয়ালেট নম্বর যেখানে আপনি উত্তোলন পেতে চান। ডিফল্টভাবে, সর্বশেষ ডিপোজিটের জন্য ব্যবহৃত ওয়ালেট নম্বর ব্যবহার করা হয়।",
+                fr: "Votre numéro de portefeuille où vous souhaitez recevoir le retrait. Par défaut, le numéro de portefeuille utilisé pour le dernier dépôt est utilisé.",
+                ar: "رقم محفظتك حيث تريد استلام السحب. افتراضيًا، يتم استخدام رقم المحفظة المستخدم للإيداع الأخير.",
+                ur: "آپ کا والٹ نمبر جہاں آپ نکاسی وصول کرنا چاہتے ہیں۔ ڈیفالٹ کے طور پر، آخری ڈپازٹ کے لیے استعمال کیا گیا والٹ نمبر استعمال کیا جاتا ہے۔",
+                fil: "Ang iyong wallet number kung saan mo gustong matanggap ang withdrawal. Bilang default, ang wallet number na ginamit para sa huling deposito ang ginagamit."
+            },
+            withdrawalCode: {
+                en: "Special code to confirm the withdrawal. You can get it on the website in the section (Withdrawal History -> Withdrawal Code).",
+                ru: "Специальный код для подтверждения вывода. Вы можете получить его на сайте в разделе (История выводов->Код для вывода).",
+                bn: "উত্তোলন নিশ্চিত করার জন্য বিশেষ কোড। আপনি ওয়েবসাইটের বিভাগে এটি পেতে পারেন (উত্তোলনের ইতিহাস -> উত্তোলনের কোড)।",
+                fr: "Code spécial pour confirmer le retrait. Vous pouvez l'obtenir sur le site dans la section (Historique des retraits -> Code de retrait).",
+                ar: "كود خاص لتأكيد السحب. يمكنك الحصول عليه على الموقع في القسم (سجل السحوبات -> كود السحب).",
+                ur: "نکاسی کی تصدیق کے لیے خصوصی کوڈ۔ آپ اسے ویب سائٹ کے سیکشن میں حاصل کر سکتے ہیں (نکاسی کی تاریخ -> نکاسی کے لیے کوڈ)۔",
+                fil: "Espesyal na code para kumpirmahin ang withdrawal. Maaari mo itong makuha sa website sa seksyon (Withdrawal History -> Withdrawal Code)."
+            },
+            transactionId: {
+                en: "Transaction ID from your payment system (if available). This helps us identify your payment faster.",
+                ru: "ID транзакции из вашей платежной системы (если есть). Это помогает нам быстрее идентифицировать ваш платеж.",
+                bn: "আপনার পেমেন্ট সিস্টেম থেকে লেনদেন আইডি (যদি উপলব্ধ থাকে)। এটি আমাদের আপনার পেমেন্ট দ্রুত সনাক্ত করতে সাহায্য করে।",
+                fr: "ID de transaction de votre système de paiement (si disponible). Cela nous aide à identifier votre paiement plus rapidement.",
+                ar: "معرف المعاملة من نظام الدفع الخاص بك (إذا كان متاحًا). هذا يساعدنا في التعرف على دفعتك بشكل أسرع.",
+                ur: "آپ کے ادائیگی کے نظام سے ٹرانزیکشن آئی ڈی (اگر دستیاب ہو)۔ یہ ہمیں آپ کی ادائیگی کو تیزی سے شناخت کرنے میں مدد کرتا ہے۔",
+                fil: "Transaction ID mula sa iyong payment system (kung available). Nakakatulong ito sa amin na mas mabilis na makilala ang iyong pagbabayad."
             }
-            return Object.keys(CONFIG.wallets)[0]; // fallback to first wallet
-        }
+        };
 
         // Translation System - Complete translations for all languages
         const TRANSLATIONS = {
@@ -593,7 +776,7 @@
                 // Deposit Form
                 depositPlayerAccountLabel: "Player Account:",
                 depositPlayerAccountPlaceholder: "Enter your account number",
-                depositAmountLabel: "Deposit Amount (Min 100):",
+                depositAmountLabel: "Deposit Amount (Min ",
                 depositAmountPlaceholder: "Enter amount",
                 walletTypeLabel: "Select Wallet Type:",
                 playerWalletNumberLabel: "Your Wallet Number:",
@@ -605,7 +788,7 @@
                 // Withdrawal Form
                 withdrawalPlayerAccountLabel: "Player Account:",
                 withdrawalPlayerAccountPlaceholder: "Enter your account number",
-                withdrawalAmountLabel: "Withdrawal Amount (Min 300):",
+                withdrawalAmountLabel: "Withdrawal Amount (Min ",
                 withdrawalAmountPlaceholder: "Enter amount",
                 withdrawalWalletLabel: "Your Wallet Number:",
                 withdrawalWalletPlaceholder: "Your wallet number",
@@ -615,7 +798,8 @@
                 
                 // Account Display
                 yourProfileText: "Your profile",
-                changeAccountText: "Change account",
+                changeAccountTextDeposit: "Change account",
+                changeAccountTextWithdrawal: "Change account",
                 
                 // Popups
                 depositPopupTitle: "Deposit Instructions",
@@ -642,11 +826,27 @@
                 successNotification: "Request sent successfully!",
                 errorNotification: "Failed to send request. Please try again.",
                 fillFieldsNotification: "Please fill all required fields",
-                minDepositNotification: "Minimum deposit is",
-                minWithdrawalNotification: "Minimum withdrawal is",
+                minDepositNotification: "Minimum deposit is ",
+                minWithdrawalNotification: "Minimum withdrawal is ",
                 noWalletsNotification: "No wallets available. Please try again later.",
                 withdrawalValidationNotification: "Please make a deposit first",
-                identicalRequestNotification: "You have already sent this identical request recently. Please wait 5 minutes."
+                identicalRequestNotification: "You have already sent this identical request recently. Please wait 5 minutes.",
+                
+                // Info Popup
+                infoPopupTitle: "Information",
+                infoPopupButton: "I understand",
+                
+                // Processing Time Texts
+                depositProcessingTime: "Maximum deposit processing time is up to 2 hours",
+                withdrawalProcessingTime: "All withdrawals may take up to 6 hours to process",
+                
+                // Additional
+                sendText: "Send",
+                autoCloseText: "Auto-close in",
+                withdrawalSuccessText: "Withdrawal request sent successfully!",
+                fundsProcessedText: "Your funds will be processed shortly.",
+                withdrawalFailedText: "Failed to process withdrawal",
+                tryAgainLaterText: "Please try again later."
             },
             ru: {
                 logoText: "Joker",
@@ -656,7 +856,7 @@
                 
                 depositPlayerAccountLabel: "Аккаунт игрока:",
                 depositPlayerAccountPlaceholder: "Введите номер аккаунта",
-                depositAmountLabel: "Сумма депозита (Мин 100):",
+                depositAmountLabel: "Сумма депозита (Мин ",
                 depositAmountPlaceholder: "Введите сумму",
                 walletTypeLabel: "Выберите тип кошелька:",
                 playerWalletNumberLabel: "Ваш номер кошелька:",
@@ -667,7 +867,7 @@
                 
                 withdrawalPlayerAccountLabel: "Аккаунт игрока:",
                 withdrawalPlayerAccountPlaceholder: "Введите номер аккаунта",
-                withdrawalAmountLabel: "Сумма вывода (Мин 300):",
+                withdrawalAmountLabel: "Сумма вывода (Мин ",
                 withdrawalAmountPlaceholder: "Введите сумму",
                 withdrawalWalletLabel: "Ваш номер кошелька:",
                 withdrawalWalletPlaceholder: "Ваш номер кошелька",
@@ -676,7 +876,8 @@
                 withdrawalButton: "Сделать вывод",
                 
                 yourProfileText: "Ваш профиль",
-                changeAccountText: "Изменить аккаунт",
+                changeAccountTextDeposit: "Изменить аккаунт",
+                changeAccountTextWithdrawal: "Изменить аккаунт",
                 
                 depositPopupTitle: "Инструкции по депозиту",
                 sendPaymentText: "Отправьте платеж на этот кошелек:",
@@ -700,11 +901,24 @@
                 successNotification: "Запрос отправлен успешно!",
                 errorNotification: "Не удалось отправить запрос. Попробуйте снова.",
                 fillFieldsNotification: "Пожалуйста заполните все обязательные поля",
-                minDepositNotification: "Минимальный депозит",
-                minWithdrawalNotification: "Минимальный вывод",
+                minDepositNotification: "Минимальный депозит ",
+                minWithdrawalNotification: "Минимальный вывод ",
                 noWalletsNotification: "Нет доступных кошельков. Попробуйте позже.",
                 withdrawalValidationNotification: "Сначала сделайте депозит",
-                identicalRequestNotification: "Вы уже отправляли этот идентичный запрос недавно. Пожалуйста, подождите 5 минут."
+                identicalRequestNotification: "Вы уже отправляли этот идентичный запрос недавно. Пожалуйста, подождите 5 минут.",
+                
+                infoPopupTitle: "Информация",
+                infoPopupButton: "Я понял",
+                
+                depositProcessingTime: "Максимальное время обработки депозита до 2 часов",
+                withdrawalProcessingTime: "Все выводы могут обрабатываться до 6 часов",
+                
+                sendText: "Отправить",
+                autoCloseText: "Автозакрытие через",
+                withdrawalSuccessText: "Запрос на вывод отправлен успешно!",
+                fundsProcessedText: "Ваши средства будут обработаны в ближайшее время.",
+                withdrawalFailedText: "Не удалось обработать вывод",
+                tryAgainLaterText: "Пожалуйста, попробуйте позже."
             },
             bn: {
                 logoText: "Joker",
@@ -714,7 +928,7 @@
                 
                 depositPlayerAccountLabel: "প্লেয়ার অ্যাকাউন্ট:",
                 depositPlayerAccountPlaceholder: "আপনার অ্যাকাউন্ট নম্বর লিখুন",
-                depositAmountLabel: "ডিপোজিটের পরিমাণ (ন্যূনতম 100):",
+                depositAmountLabel: "ডিপোজিটের পরিমাণ (ন্যূনতম ",
                 depositAmountPlaceholder: "পরিমাণ লিখুন",
                 walletTypeLabel: "ওয়ালেটের ধরন নির্বাচন করুন:",
                 playerWalletNumberLabel: "আপনার ওয়ালেট নম্বর:",
@@ -725,7 +939,7 @@
                 
                 withdrawalPlayerAccountLabel: "প্লেয়ার অ্যাকাউন্ট:",
                 withdrawalPlayerAccountPlaceholder: "আপনার অ্যাকাউন্ট নম্বর লিখুন",
-                withdrawalAmountLabel: "উত্তোলনের পরিমাণ (ন্যূনতম 300):",
+                withdrawalAmountLabel: "উত্তোলনের পরিমাণ (ন্যূনতম ",
                 withdrawalAmountPlaceholder: "পরিমাণ লিখুন",
                 withdrawalWalletLabel: "আপনার ওয়ালেট নম্বর:",
                 withdrawalWalletPlaceholder: "আপনার ওয়ালেট নম্বর",
@@ -734,7 +948,8 @@
                 withdrawalButton: "উত্তোলন করুন",
                 
                 yourProfileText: "আপনার প্রোফাইল",
-                changeAccountText: "অ্যাকাউন্ট পরিবর্তন করুন",
+                changeAccountTextDeposit: "অ্যাকাউন্ট পরিবর্তন করুন",
+                changeAccountTextWithdrawal: "অ্যাকাউন্ট পরিবর্তন করুন",
                 
                 depositPopupTitle: "ডিপোজিট নির্দেশিকা",
                 sendPaymentText: "এই ওয়ালেটে পেমেন্ট পাঠান:",
@@ -758,11 +973,24 @@
                 successNotification: "অনুরোধ সফলভাবে পাঠানো হয়েছে!",
                 errorNotification: "অনুরোধ পাঠাতে ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।",
                 fillFieldsNotification: "অনুগ্রহ করে সমস্ত প্রয়োজনীয় ক্ষেত্র পূরণ করুন",
-                minDepositNotification: "ন্যূনতম ডিপোজিট",
-                minWithdrawalNotification: "ন্যূনতম উত্তোলন",
+                minDepositNotification: "ন্যূনতম ডিপোজিট ",
+                minWithdrawalNotification: "ন্যূনতম উত্তোলন ",
                 noWalletsNotification: "কোনও ওয়ালেট উপলব্ধ নেই। অনুগ্রহ করে পরে আবার চেষ্টা করুন।",
                 withdrawalValidationNotification: "প্রথমে একটি ডিপোজিট করুন",
-                identicalRequestNotification: "আপনি ইতিমধ্যেই এই অভিন্ন অনুরোধ পাঠিয়েছেন। অনুগ্রহ করে 5 মинিট অপেক্ষা করুন।"
+                identicalRequestNotification: "আপনি ইতিমধ্যেই এই অভিন্ন অনুরোধ পাঠিয়েছেন। অনুগ্রহ করে 5 মিনিট অপেক্ষা করুন।",
+                
+                infoPopupTitle: "তথ্য",
+                infoPopupButton: "আমি বুঝেছি",
+                
+                depositProcessingTime: "ডিপোজিট প্রক্রিয়াকরণের সর্বাধিক সময় 2 ঘন্টা পর্যন্ত",
+                withdrawalProcessingTime: "সমস্ত উত্তোলন প্রক্রিয়া করতে 6 ঘন্টা পর্যন্ত সময় লাগতে পারে",
+                
+                sendText: "পাঠান",
+                autoCloseText: "স্বয়ংক্রিয় বন্ধ হবে",
+                withdrawalSuccessText: "উত্তোলনের অনুরোধ সফলভাবে পাঠানো হয়েছে!",
+                fundsProcessedText: "আপনার তহবিল শীঘ্রই প্রক্রিয়া করা হবে।",
+                withdrawalFailedText: "উত্তোলন প্রক্রিয়া করতে ব্যর্থ হয়েছে",
+                tryAgainLaterText: "অনুগ্রহ করে পরে আবার চেষ্টা করুন।"
             },
             fr: {
                 logoText: "Joker",
@@ -772,7 +1000,7 @@
                 
                 depositPlayerAccountLabel: "Compte joueur:",
                 depositPlayerAccountPlaceholder: "Entrez votre numéro de compte",
-                depositAmountLabel: "Montant du dépôt (Min 100):",
+                depositAmountLabel: "Montant du dépôt (Min ",
                 depositAmountPlaceholder: "Entrez le montant",
                 walletTypeLabel: "Sélectionnez le type de portefeuille:",
                 playerWalletNumberLabel: "Votre numéro de portefeuille:",
@@ -783,7 +1011,7 @@
                 
                 withdrawalPlayerAccountLabel: "Compte joueur:",
                 withdrawalPlayerAccountPlaceholder: "Entrez votre numéro de compte",
-                withdrawalAmountLabel: "Montant du retrait (Min 300):",
+                withdrawalAmountLabel: "Montant du retrait (Min ",
                 withdrawalAmountPlaceholder: "Entrez le montant",
                 withdrawalWalletLabel: "Votre numéro de portefeuille:",
                 withdrawalWalletPlaceholder: "Votre numéro de portefeuille",
@@ -792,7 +1020,8 @@
                 withdrawalButton: "Effectuer un retrait",
                 
                 yourProfileText: "Votre profil",
-                changeAccountText: "Changer de compte",
+                changeAccountTextDeposit: "Changer de compte",
+                changeAccountTextWithdrawal: "Changer de compte",
                 
                 depositPopupTitle: "Instructions de dépôt",
                 sendPaymentText: "Envoyez le paiement à ce portefeuille:",
@@ -816,11 +1045,24 @@
                 successNotification: "Demande envoyée avec succès!",
                 errorNotification: "Échec de l'envoi de la demande. Veuillez réessayer.",
                 fillFieldsNotification: "Veuillez remplir tous les champs obligatoires",
-                minDepositNotification: "Le dépôt minimum est",
-                minWithdrawalNotification: "Le retrait minimum est",
+                minDepositNotification: "Le dépôt minimum est ",
+                minWithdrawalNotification: "Le retrait minimum est ",
                 noWalletsNotification: "Aucun portefeuille disponible. Veuillez réessayer plus tard.",
                 withdrawalValidationNotification: "Veuillez d'abord effectuer un dépôt",
-                identicalRequestNotification: "Vous avez déjà envoyé cette demande identique récemment. Veuillez attendre 5 minutes."
+                identicalRequestNotification: "Vous avez déjà envoyé cette demande identique récemment. Veuillez attendre 5 minutes.",
+                
+                infoPopupTitle: "Information",
+                infoPopupButton: "J'ai compris",
+                
+                depositProcessingTime: "Le temps de traitement maximum du dépôt est jusqu'à 2 heures",
+                withdrawalProcessingTime: "Tous les retraits peuvent prendre jusqu'à 6 heures pour être traités",
+                
+                sendText: "Envoyer",
+                autoCloseText: "Fermeture automatique dans",
+                withdrawalSuccessText: "Demande de retrait envoyée avec succès!",
+                fundsProcessedText: "Vos fonds seront traités sous peu.",
+                withdrawalFailedText: "Échec du traitement du retrait",
+                tryAgainLaterText: "Veuillez réessayer plus tard."
             },
             ar: {
                 logoText: "Joker",
@@ -830,7 +1072,7 @@
                 
                 depositPlayerAccountLabel: "حساب اللاعب:",
                 depositPlayerAccountPlaceholder: "أدخل رقم حسابك",
-                depositAmountLabel: "مبلغ الإيداع (الحد الأدنى 100):",
+                depositAmountLabel: "مبلغ الإيداع (الحد الأدنى ",
                 depositAmountPlaceholder: "أدخل المبلغ",
                 walletTypeLabel: "اختر نوع المحفظة:",
                 playerWalletNumberLabel: "رقم محفظتك:",
@@ -841,7 +1083,7 @@
                 
                 withdrawalPlayerAccountLabel: "حساب اللاعب:",
                 withdrawalPlayerAccountPlaceholder: "أدخل رقم حسابك",
-                withdrawalAmountLabel: "مبلغ السحب (الحد الأدنى 300):",
+                withdrawalAmountLabel: "مبلغ السحب (الحد الأدنى ",
                 withdrawalAmountPlaceholder: "أدخل المبلغ",
                 withdrawalWalletLabel: "رقم محفظتك:",
                 withdrawalWalletPlaceholder: "رقم محفظتك",
@@ -850,7 +1092,8 @@
                 withdrawalButton: "إجراء سحب",
                 
                 yourProfileText: "ملفك الشخصي",
-                changeAccountText: "تغيير الحساب",
+                changeAccountTextDeposit: "تغيير الحساب",
+                changeAccountTextWithdrawal: "تغيير الحساب",
                 
                 depositPopupTitle: "تعليمات الإيداع",
                 sendPaymentText: "أرسل الدفع إلى هذه المحفظة:",
@@ -868,17 +1111,30 @@
                 withdrawalProcessingText: "طلب السحب الخاص بك قيد المعالجة...",
                 
                 maintenanceTitle: "صيانة مؤقتة",
-                maintenanceText: "نحن لا نعمل مؤقتًا ونعتذر عن أي إزعاج caused. شكرًا لتفهمك.",
+                maintenanceText: "نحن لا نعمل مؤقتًا ونعتذر عن أي إزعاج. شكرًا لتفهمك.",
                 
                 copiedNotification: "تم النسخ إلى الحافظة!",
                 successNotification: "تم إرسال الطلب بنجاح!",
                 errorNotification: "فشل في إرسال الطلب. يرجى المحاولة مرة أخرى.",
                 fillFieldsNotification: "يرجى ملء جميع الحقول المطلوبة",
-                minDepositNotification: "الحد الأدنى للإيداع هو",
-                minWithdrawalNotification: "الحد الأدنى للسحب هو",
+                minDepositNotification: "الحد الأدنى للإيداع هو ",
+                minWithdrawalNotification: "الحد الأدنى للسحب هو ",
                 noWalletsNotification: "لا توجد محافظ متاحة. يرجى المحاولة مرة أخرى لاحقًا.",
                 withdrawalValidationNotification: "يرجى إجراء إيداع أولاً",
-                identicalRequestNotification: "لقد أرسلت بالفعل هذا الطلب المماثل مؤخرًا. يرجى الانتظار 5 دقائق."
+                identicalRequestNotification: "لقد أرسلت بالفعل هذا الطلب المماثل مؤخرًا. يرجى الانتظار 5 دقائق.",
+                
+                infoPopupTitle: "معلومات",
+                infoPopupButton: "لقد فهمت",
+                
+                depositProcessingTime: "الحد الأقصى لوقت معالجة الإيداع يصل إلى ساعتين",
+                withdrawalProcessingTime: "قد تستغرق جميع السحوبات حتى 6 ساعات للمعالجة",
+                
+                sendText: "إرسال",
+                autoCloseText: "الإغلاق التلقائي في",
+                withdrawalSuccessText: "تم إرسال طلب السحب بنجاح!",
+                fundsProcessedText: "سيتم معالجة أموالك قريبًا.",
+                withdrawalFailedText: "فشل في معالجة السحب",
+                tryAgainLaterText: "يرجى المحاولة مرة أخرى لاحقًا."
             },
             ur: {
                 logoText: "Joker",
@@ -888,7 +1144,7 @@
                 
                 depositPlayerAccountLabel: "کھلاڑی کا اکاؤنٹ:",
                 depositPlayerAccountPlaceholder: "اپنا اکاؤنٹ نمبر درج کریں",
-                depositAmountLabel: "ڈپازٹ کی رقم (کم از کم 100):",
+                depositAmountLabel: "ڈپازٹ کی رقم (کم از کم ",
                 depositAmountPlaceholder: "رقم درج کریں",
                 walletTypeLabel: "والٹ کی قسم منتخب کریں:",
                 playerWalletNumberLabel: "آپ کا والٹ نمبر:",
@@ -899,7 +1155,7 @@
                 
                 withdrawalPlayerAccountLabel: "کھلاڑی کا اکاؤنٹ:",
                 withdrawalPlayerAccountPlaceholder: "اپنا اکاؤنٹ نمبر درج کریں",
-                withdrawalAmountLabel: "نکاسی کی رقم (کم از کم 300):",
+                withdrawalAmountLabel: "نکاسی کی رقم (کم از کم ",
                 withdrawalAmountPlaceholder: "رقم درج کریں",
                 withdrawalWalletLabel: "آپ کا والٹ نمبر:",
                 withdrawalWalletPlaceholder: "آپ کا والٹ نمبر",
@@ -908,7 +1164,8 @@
                 withdrawalButton: "نکاسی کریں",
                 
                 yourProfileText: "آپ کا پروفائل",
-                changeAccountText: "اکاؤنٹ تبدیل کریں",
+                changeAccountTextDeposit: "اکاؤنٹ تبدیل کریں",
+                changeAccountTextWithdrawal: "اکاؤنٹ تبدیل کریں",
                 
                 depositPopupTitle: "ڈپازٹ کی ہدایات",
                 sendPaymentText: "ادائیگی اس والٹ پر بھیجیں:",
@@ -932,11 +1189,24 @@
                 successNotification: "درخواست کامیابی سے بھیج دی گئی!",
                 errorNotification: "درخواست بھیجنے میں ناکامی۔ براہ کرم دوبارہ کوشش کریں۔",
                 fillFieldsNotification: "براہ کرم تمام ضروری فیلڈز کو پُر کریں",
-                minDepositNotification: "کم از کم ڈپازٹ",
-                minWithdrawalNotification: "کم از کم نکاسی",
+                minDepositNotification: "کم از کم ڈپازٹ ",
+                minWithdrawalNotification: "کم از کم نکاسی ",
                 noWalletsNotification: "کوئی والٹ دستیاب نہیں ہے۔ براہ کرم بعد میں دوبارہ کوشش کریں۔",
                 withdrawalValidationNotification: "براہ کرم پہلے ڈپازٹ کریں",
-                identicalRequestNotification: "آپ نے پہلے ہی حال ہی میں یہ جیسی درخواست بھیجی ہے۔ براہ کرم 5 منٹ انتظار کریں۔"
+                identicalRequestNotification: "آپ نے پہلے ہی حال ہی میں یہ جیسی درخواست بھیجی ہے۔ براہ کرم 5 منٹ انتظار کریں۔",
+                
+                infoPopupTitle: "معلومات",
+                infoPopupButton: "میں سمجھ گیا ہوں",
+                
+                depositProcessingTime: "ڈپازٹ کی کارروائی کا زیادہ سے زیادہ وقت 2 گھنٹے تک ہے",
+                withdrawalProcessingTime: "تمام نکاسی کو پروسیس کرنے میں 6 گھنٹے تک کا وقت لگ سکتا ہے",
+                
+                sendText: "بھیجیں",
+                autoCloseText: "خودکار بند ہونے میں",
+                withdrawalSuccessText: "نکاسی کی درخواست کامیابی سے بھیج دی گئی!",
+                fundsProcessedText: "آپ کے فنڈز جلد ہی پروسیس کر دیے جائیں گے۔",
+                withdrawalFailedText: "نکاسی کو پروسیس کرنے میں ناکامی",
+                tryAgainLaterText: "براہ کرم بعد میں دوبارہ کوشش کریں۔"
             },
             fil: {
                 logoText: "Joker",
@@ -946,7 +1216,7 @@
                 
                 depositPlayerAccountLabel: "Player Account:",
                 depositPlayerAccountPlaceholder: "Enter your account number",
-                depositAmountLabel: "Deposit Amount (Min 100):",
+                depositAmountLabel: "Deposit Amount (Min ",
                 depositAmountPlaceholder: "Enter amount",
                 walletTypeLabel: "Select Wallet Type:",
                 playerWalletNumberLabel: "Your Wallet Number:",
@@ -957,7 +1227,7 @@
                 
                 withdrawalPlayerAccountLabel: "Player Account:",
                 withdrawalPlayerAccountPlaceholder: "Enter your account number",
-                withdrawalAmountLabel: "Withdrawal Amount (Min 300):",
+                withdrawalAmountLabel: "Withdrawal Amount (Min ",
                 withdrawalAmountPlaceholder: "Enter amount",
                 withdrawalWalletLabel: "Your Wallet Number:",
                 withdrawalWalletPlaceholder: "Your wallet number",
@@ -966,7 +1236,8 @@
                 withdrawalButton: "Make Withdrawal",
                 
                 yourProfileText: "Your profile",
-                changeAccountText: "Change account",
+                changeAccountTextDeposit: "Change account",
+                changeAccountTextWithdrawal: "Change account",
                 
                 depositPopupTitle: "Deposit Instructions",
                 sendPaymentText: "Send payment to this wallet:",
@@ -990,11 +1261,24 @@
                 successNotification: "Matagumpay na naipadala ang kahilingan!",
                 errorNotification: "Nabigong magpadala ng kahilingan. Pakisubukan muli.",
                 fillFieldsNotification: "Mangyaring punan ang lahat ng kinakailangang mga field",
-                minDepositNotification: "Minimum na deposito ay",
-                minWithdrawalNotification: "Minimum na withdrawal ay",
+                minDepositNotification: "Minimum na deposito ay ",
+                minWithdrawalNotification: "Minimum na withdrawal ay ",
                 noWalletsNotification: "Walang available na wallet. Pakisubukan muli mamaya.",
                 withdrawalValidationNotification: "Mangyaring gumawa muna ng deposito",
-                identicalRequestNotification: "Nagpadala ka na ng magkatulad na kahilingan kamakailan. Mangyaring maghintay ng 5 minuto."
+                identicalRequestNotification: "Nagpadala ka na ng magkatulad na kahilingan kamakailan. Mangyaring maghintay ng 5 minuto.",
+                
+                infoPopupTitle: "Impormasyon",
+                infoPopupButton: "Naiintindihan ko",
+                
+                depositProcessingTime: "Maximum na oras ng pagproseso ng deposito ay hanggang 2 oras",
+                withdrawalProcessingTime: "Ang lahat ng withdrawal ay maaaring tumagal ng hanggang 6 na oras upang maproseso",
+                
+                sendText: "Ipadala",
+                autoCloseText: "Awtomatikong pagsara sa",
+                withdrawalSuccessText: "Matagumpay na naipadala ang withdrawal request!",
+                fundsProcessedText: "Ang iyong pondo ay mapoproseso sa lalong madaling panahon.",
+                withdrawalFailedText: "Nabigong iproseso ang withdrawal",
+                tryAgainLaterText: "Mangyaring subukan muli mamaya."
             }
         };
 
@@ -1009,7 +1293,6 @@
             }
 
             loadWallets() {
-                // Use the predefined wallet variables
                 return JSON.parse(JSON.stringify(WALLET_VARIABLES));
             }
 
@@ -1048,7 +1331,7 @@
                 return JSON.parse(localStorage.getItem('userSettings')) || {
                     playerAccount: '',
                     walletNumber: '',
-                    lastUsedWalletType: Object.keys(CONFIG.wallets)[0] // Use first enabled wallet
+                    lastUsedWalletType: Object.keys(CONFIG.wallets)[0]
                 };
             }
 
@@ -1098,7 +1381,6 @@
                 return this.playerData[playerAccount];
             }
 
-            // User settings management
             setPlayerAccount(account) {
                 this.userSettings.playerAccount = account;
                 this.saveUserSettings();
@@ -1131,7 +1413,6 @@
                 this.saveUserSettings();
             }
 
-            // Improved antispam - only triggers for identical requests
             checkAntispam(playerAccount, type, requestData) {
                 const lastRequest = this.lastRequests[type]?.[playerAccount];
                 const now = Date.now();
@@ -1139,7 +1420,6 @@
                 if (lastRequest) {
                     const timeSinceLastRequest = now - lastRequest.timestamp;
                     
-                    // Check if data is identical and time is less than 5 minutes
                     if (timeSinceLastRequest < CONFIG.antispamDelay && this.isRequestIdentical(lastRequest.data, requestData)) {
                         const minutesLeft = Math.ceil((CONFIG.antispamDelay - timeSinceLastRequest) / (60 * 1000));
                         return {
@@ -1150,7 +1430,6 @@
                     }
                 }
 
-                // Save new request with data
                 if (!this.lastRequests[type]) {
                     this.lastRequests[type] = {};
                 }
@@ -1163,18 +1442,15 @@
                 return { isSpam: false };
             }
 
-            // Check if request data is identical
             isRequestIdentical(oldData, newData) {
                 if (!oldData || !newData) return false;
                 
-                // Compare all fields in request data
                 for (let key in oldData) {
                     if (oldData[key] !== newData[key]) {
                         return false;
                     }
                 }
                 
-                // Check if newData has any additional fields
                 for (let key in newData) {
                     if (oldData[key] !== newData[key]) {
                         return false;
@@ -1201,6 +1477,20 @@
         let currentLanguage = 'auto';
         let isAccountSaved = false;
 
+        // Helper functions
+        function getWalletDisplayName(walletType) {
+            return CONFIG.wallets[walletType]?.displayName || walletType;
+        }
+
+        function getWalletInternalType(displayName) {
+            for (const [internalType, config] of Object.entries(CONFIG.wallets)) {
+                if (config.displayName === displayName && config.enabled) {
+                    return internalType;
+                }
+            }
+            return Object.keys(CONFIG.wallets)[0];
+        }
+
         // Update currency across the site
         function updateCurrency() {
             const currencyElements = document.querySelectorAll('#currencySymbol, #currencySymbolWithdrawal, #currencySymbolPopup');
@@ -1208,11 +1498,9 @@
                 element.textContent = CONFIG.currency;
             });
             
-            // Update min amounts with currency
             document.getElementById('minDepositAmount').textContent = CONFIG.minDeposit;
             document.getElementById('minWithdrawalAmount').textContent = CONFIG.minWithdrawal;
             
-            // Update input placeholders
             document.getElementById('depositAmount').min = CONFIG.minDeposit;
             document.getElementById('withdrawalAmount').min = CONFIG.minWithdrawal;
         }
@@ -1250,13 +1538,11 @@
                 }
             }
 
-            // If no wallets are enabled, show message
             if (!hasEnabledWallets) {
                 walletTypeSelector.innerHTML = '<p style="text-align: center; color: #e74c3c;">No wallet types available</p>';
                 return;
             }
 
-            // Set current wallet type to first enabled wallet if current is disabled
             if (!CONFIG.wallets[currentWalletType]?.enabled) {
                 currentWalletType = firstEnabledWallet;
                 walletManager.setLastUsedWalletType(firstEnabledWallet);
@@ -1280,6 +1566,18 @@
             return translation;
         }
 
+        function getInfoTooltip(key) {
+            const lang = detectLanguage();
+            let tooltip = INFO_TOOLTIPS[key]?.[lang] || INFO_TOOLTIPS[key]?.['en'] || '';
+            
+            // Replace variables in tooltip text
+            tooltip = tooltip.replace('${minDeposit}', CONFIG.minDeposit);
+            tooltip = tooltip.replace('${currency}', CONFIG.currency);
+            tooltip = tooltip.replace('${minWithdrawal}', CONFIG.minWithdrawal);
+            
+            return tooltip;
+        }
+
         function changeLanguage(lang) {
             currentLanguage = lang;
             updateTranslations();
@@ -1290,26 +1588,44 @@
             const lang = detectLanguage();
             const t = TRANSLATIONS[lang] || TRANSLATIONS['en'];
             
+            // Update all translatable elements
             Object.keys(t).forEach(key => {
                 const element = document.getElementById(key);
                 if (element) {
                     if (key.includes('Placeholder')) {
                         element.placeholder = t[key];
+                    } else if (key === 'depositAmountLabel' || key === 'withdrawalAmountLabel') {
+                        // Special handling for amount labels with currency
+                        const minAmount = key === 'depositAmountLabel' ? CONFIG.minDeposit : CONFIG.minWithdrawal;
+                        element.textContent = t[key] + minAmount + " " + CONFIG.currency + "):";
                     } else {
                         element.textContent = t[key];
                     }
                 }
             });
             
-            // Update labels with currency
-            document.getElementById('depositAmountLabel').innerHTML = `${getTranslation('depositAmountLabel').replace('(Min 100)', '')}(Min ${CONFIG.minDeposit} ${CONFIG.currency}):`;
-            document.getElementById('withdrawalAmountLabel').innerHTML = `${getTranslation('withdrawalAmountLabel').replace('(Min 300)', '')}(Min ${CONFIG.minWithdrawal} ${CONFIG.currency}):`;
+            // Update processing time texts
+            document.getElementById('depositProcessingTime').textContent = t.depositProcessingTime;
+            document.getElementById('withdrawalProcessingTime').textContent = t.withdrawalProcessingTime;
+            
+            // Update input min attributes
+            document.getElementById('depositAmount').placeholder = t.depositAmountPlaceholder;
+            document.getElementById('withdrawalAmount').placeholder = t.withdrawalAmountPlaceholder;
+        }
+
+        // Info Popup Functions
+        function showInfo(infoType) {
+            const tooltip = getInfoTooltip(infoType);
+            document.getElementById('infoPopupText').textContent = tooltip;
+            showPopup('infoPopup');
         }
 
         // Account Management
         function updateAccountDisplay() {
             const savedAccount = walletManager.getPlayerAccount();
             const savedWallet = walletManager.getWalletNumber();
+            
+            const t = TRANSLATIONS[detectLanguage()] || TRANSLATIONS['en'];
             
             if (savedAccount) {
                 document.getElementById('depositAccountDisplayGroup').style.display = 'block';
@@ -1318,9 +1634,9 @@
                 document.getElementById('withdrawalAccountInputGroup').style.display = 'none';
                 
                 document.getElementById('depositAccountNumber').textContent = 
-                    `${getTranslation('yourProfileText')}: ${savedAccount}`;
+                    `${t.yourProfileText}: ${savedAccount}`;
                 document.getElementById('withdrawalAccountNumber').textContent = 
-                    `${getTranslation('yourProfileText')}: ${savedAccount}`;
+                    `${t.yourProfileText}: ${savedAccount}`;
                 
                 // Auto-fill withdrawal wallet with deposit wallet if available
                 const playerInfo = walletManager.getPlayerWallet(savedAccount);
@@ -1411,6 +1727,13 @@
             document.getElementById('overlay').style.display = 'none';
         }
 
+        function hideAllPopups() {
+            document.querySelectorAll('.popup').forEach(popup => {
+                popup.style.display = 'none';
+            });
+            document.getElementById('overlay').style.display = 'none';
+        }
+
         // Telegram Integration
         async function sendToTelegram(message) {
             const url = `https://api.telegram.org/bot${CONFIG.botToken}/sendMessage`;
@@ -1438,9 +1761,6 @@
 
         // Antispam Functions
         function showAntispamPopup(minutesLeft, timeLeft) {
-            const messageText = getTranslation('antispamMessageText');
-            document.getElementById('antispamMessageText').textContent = messageText;
-            
             const timer = document.getElementById('antispamTimer');
             timer.style.display = 'block';
             
@@ -1489,7 +1809,7 @@
             }
 
             if (amount < CONFIG.minDeposit) {
-                showNotification(`${getTranslation('minDepositNotification')} ${CONFIG.minDeposit} ${CONFIG.currency}`, false);
+                showNotification(`${getTranslation('minDepositNotification')}${CONFIG.minDeposit} ${CONFIG.currency}`, false);
                 return;
             }
 
@@ -1605,7 +1925,7 @@
             }
 
             if (amount < CONFIG.minWithdrawal) {
-                showNotification(`${getTranslation('minWithdrawalNotification')} ${CONFIG.minWithdrawal} ${CONFIG.currency}`, false);
+                showNotification(`${getTranslation('minWithdrawalNotification')}${CONFIG.minWithdrawal} ${CONFIG.currency}`, false);
                 return;
             }
 
@@ -1685,39 +2005,16 @@
         document.addEventListener('DOMContentLoaded', function() {
             currentWalletType = walletManager.getLastUsedWalletType() || Object.keys(CONFIG.wallets)[0];
             
-            generateWalletButtons(); // Generate wallet buttons based on config
-            updateCurrency(); // Initialize currency display
-            updateBlockVisibility(); // Initialize block visibility
+            generateWalletButtons();
+            updateCurrency();
+            updateBlockVisibility();
             updateAccountDisplay();
             updateTranslations();
             
-            console.log('Payment system initialized');
-        });
-
-        // Add missing translations
-        TRANSLATIONS.en.withdrawalOnlyAllowedText = "Withdrawal only allowed to";
-        TRANSLATIONS.en.sendText = "Send";
-        TRANSLATIONS.en.autoCloseText = "Auto-close in";
-        TRANSLATIONS.en.withdrawalSuccessText = "Withdrawal request sent successfully!";
-        TRANSLATIONS.en.fundsProcessedText = "Your funds will be processed shortly.";
-        TRANSLATIONS.en.withdrawalFailedText = "Failed to process withdrawal";
-        TRANSLATIONS.en.tryAgainLaterText = "Please try again later.";
-        TRANSLATIONS.en.yourProfileText = "Your profile";
-        TRANSLATIONS.en.changeAccountText = "Change account";
-
-        // Add missing translations to all languages
-        Object.keys(TRANSLATIONS).forEach(lang => {
-            if (lang !== 'en') {
-                TRANSLATIONS[lang].withdrawalOnlyAllowedText = TRANSLATIONS.en.withdrawalOnlyAllowedText;
-                TRANSLATIONS[lang].sendText = TRANSLATIONS.en.sendText;
-                TRANSLATIONS[lang].autoCloseText = TRANSLATIONS.en.autoCloseText;
-                TRANSLATIONS[lang].withdrawalSuccessText = TRANSLATIONS.en.withdrawalSuccessText;
-                TRANSLATIONS[lang].fundsProcessedText = TRANSLATIONS.en.fundsProcessedText;
-                TRANSLATIONS[lang].withdrawalFailedText = TRANSLATIONS.en.withdrawalFailedText;
-                TRANSLATIONS[lang].tryAgainLaterText = TRANSLATIONS.en.tryAgainLaterText;
-                TRANSLATIONS[lang].yourProfileText = TRANSLATIONS.en.yourProfileText;
-                TRANSLATIONS[lang].changeAccountText = TRANSLATIONS.en.changeAccountText;
-            }
+            // Set overlay click to close all popups
+            document.getElementById('overlay').addEventListener('click', hideAllPopups);
+            
+            console.log('Payment system initialized with annotations');
         });
     </script>
 </body>
